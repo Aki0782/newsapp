@@ -1,118 +1,84 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import { useAppState } from "@react-native-community/hooks";
+import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
+import { QueryClient, focusManager } from "@tanstack/react-query";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { Logger, Toast } from "@Utils";
+import { AxiosError } from "axios";
+import React, { useEffect } from "react";
+import { SafeAreaView, ScrollView, StatusBar, useColorScheme } from "react-native";
+import { MMKV } from "react-native-mmkv";
+import { Colors, Header } from "react-native/Libraries/NewAppScreen";
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
+interface AsyncStorage {
+  getItem: (key: string) => Promise<string | null>;
+  setItem: (key: string, value: string) => Promise<unknown>;
+  removeItem: (key: string) => Promise<void>;
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+export const mmkv = new MMKV();
+
+const storage: AsyncStorage = {
+  getItem: async (key: string) => await Promise.resolve(mmkv.getString(key) ?? null),
+  setItem: async (key: string, value: string) => await Promise.resolve(mmkv.set(key, value)),
+  removeItem: async (key: string) => await Promise.resolve(mmkv.delete(key))
+};
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 60 * 24 * 2,
+      cacheTime: 1000 * 60 * 60 * 24 * 7,
+      retry: 0,
+      refetchOnWindowFocus: true, // Focus Manager must be set to true manually using app state.
+      onError: (error) => {
+        const err = error as AxiosError;
+
+        if (err.message === "Network Error") Toast(err);
+        Logger(err);
+      }
+    }
+  }
+});
+
+const persister = createAsyncStoragePersister({
+  storage
+});
+
+persistQueryClient({
+  queryClient,
+  persister,
+  maxAge: 1000 * 60 * 60 * 24 * 7
+});
+
+const App: React.FC = () => {
+  const appState = useAppState();
+  const isDarkMode = useColorScheme() === "dark";
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter
   };
+
+  useEffect(() => {
+    if (appState === "active") {
+      // Set focusing to true to trgigger refetching of inavalidated/stale queries
+      // By default react query in react native can't detect whether app is in focus or not
+      focusManager.setFocused(true);
+    } else {
+      focusManager.setFocused(false);
+    }
+  }, [appState]);
 
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        barStyle={isDarkMode ? "light-content" : "dark-content"}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" style={backgroundStyle}>
         <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+};
 
 export default App;

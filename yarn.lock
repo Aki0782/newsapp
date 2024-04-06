@@ -1720,6 +1720,11 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/eslint-plugin/-/eslint-plugin-1.3.0.tgz#9e558170c106bbafaa1ef502bd8e6d4651012bf9"
   integrity sha512-+zDZ20NUnSWghj7Ku5aFphMzuM9JulqCW+aPXT6IfIXFbb8tzYTTOSeRFOtuekJ99ibW2fUCSsjuKNlwDIbHFg==
 
+"@react-native-community/hooks@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@react-native-community/hooks/-/hooks-3.0.0.tgz#af5f2ca32eea59b792ce9e3d9a4cf0354f9b195f"
+  integrity sha512-g2OyxXHfwIytXUJitBR6Z/ISoOfp0WKx5FOv+NqJ/CrWjRDcTw6zXE5I1C9axfuh30kJqzWchVfCDrkzZYTxqg==
+
 "@react-native/assets-registry@0.73.1":
   version "0.73.1"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.73.1.tgz#e2a6b73b16c183a270f338dc69c36039b3946e85"
@@ -1956,6 +1961,13 @@
   version "4.29.25"
   resolved "https://registry.yarnpkg.com/@tanstack/eslint-plugin-query/-/eslint-plugin-query-4.29.25.tgz#422693f8a08d3dc98ca22135913b9a36ae51510c"
   integrity sha512-wn+My+vBVTH/BZouf5syhUiUrCYiuAwRdepO/gjn6BBwYyN7XQ8cS/ooO0h2ut0h1G3UO52q26An8jYJCjR29w==
+
+"@tanstack/query-async-storage-persister@4.32.0":
+  version "4.32.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-async-storage-persister/-/query-async-storage-persister-4.32.0.tgz#af350ada6fa68b8a7622c1e34fcd69e05219cf57"
+  integrity sha512-9ihTqODroVOBW1AwJF8AgJpnmlDri9aVDW2kx8kCNdT67mLJaHxq3LA8+k8veTU1+zcRUp1pDOlxXv+kmy6q/g==
+  dependencies:
+    "@tanstack/query-persist-client-core" "4.32.0"
 
 "@tanstack/query-core@4.32.0":
   version "4.32.0"
@@ -6602,10 +6614,10 @@ react-native-encrypted-storage@4.0.3:
   resolved "https://registry.yarnpkg.com/react-native-encrypted-storage/-/react-native-encrypted-storage-4.0.3.tgz#2a4d65459870511e8f4ccd22f02433dab7fa5e91"
   integrity sha512-0pJA4Aj2S1PIJEbU7pN/Qvf7JIJx3hFywx+i+bLHtgK0/6Zryf1V2xVsWcrD50dfiu3jY1eN2gesQ5osGxE7jA==
 
-react-native-mmkv@2.10.1:
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-2.10.1.tgz#1a4e64edbf9561fe81a5ae3cefde17e88dfc669f"
-  integrity sha512-MCrYytUJ3JhSVg7LwVXCj7ExbMHe48FoQdDA1xo1q/M4c1/QyI3M9L9d2dyJUhYPnsSO0+5c2mJICm7v39XA0w==
+react-native-mmkv@2.12.2:
+  version "2.12.2"
+  resolved "https://registry.yarnpkg.com/react-native-mmkv/-/react-native-mmkv-2.12.2.tgz#4bba0f5f04e2cf222494cce3a9794ba6a4894dee"
+  integrity sha512-6058Aq0p57chPrUutLGe9fYoiDVDNMU2PKV+lLFUJ3GhoHvUrLdsS1PDSCLr00yqzL4WJQ7TTzH+V8cpyrNcfg==
 
 react-native@0.73.6:
   version "0.73.6"

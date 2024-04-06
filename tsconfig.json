@@ -21,8 +21,8 @@
       "@Constants/*": [
         "src/Constants/*"
       ],
-      "@Utils/*": [
-        "src/Utils/*"
+      "@Utils": [
+        "src/Utils"
       ],
       "@Pages": [
         "src/Pages"
