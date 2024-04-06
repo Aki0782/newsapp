@@ -1,0 +1,260 @@
+{
+    "env": {
+        "es2021": true,
+        "jest": true
+    },
+    "root": true,
+    "extends": [
+        "@react-native-community",
+        "plugin:react/recommended",
+        "standard-with-typescript",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@tanstack/eslint-plugin-query/recommended",
+        "prettier"
+    ],
+    "overrides": [
+        {
+            "files": [
+                "src/**/*.ts",
+                "src/**/*.tsx"
+            ],
+            "env": {
+                "jest": true
+            },
+            "rules": {
+                "@typescript-eslint/no-shadow": "error",
+                "no-shadow": "off",
+                "no-undef": "off",
+                "@typescript-eslint/quotes": "off",
+                "@typescript-eslint/semi": "off",
+                "@typescript-eslint/indent": "off",
+                "@typescript-eslint/member-delimiter-style": "off",
+                "@typescript-eslint/no-unused-vars": "error",
+                "@typescript-eslint/no-empty-function": "off",
+                "@typescript-eslint/no-explicit-any": "error",
+                "@typescript-eslint/space-before-function-paren": "off",
+                "@typescript-eslint/strict-boolean-expressions": "off",
+                "@typescript-eslint/prefer-nullish-coalescing": "off",
+                "@typescript-eslint/return-await": "off",
+                "@typescript-eslint/consistent-type-definitions": "off",
+                "@typescript-eslint/no-use-before-define": "off"
+            }
+        }
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "sourceType": "module",
+        "project": [
+            "./tsconfig.json"
+        ]
+    },
+    "plugins": [
+        "react",
+        "react-native",
+        "prettier"
+    ],
+    "rules": {
+        "prettier/prettier": [
+            "error",
+            {
+                "tabWidth": 2,
+                "bracketSpacing": true,
+                "singleQuote": false,
+                "arrowParens": "always",
+                "semi": true,
+                "trailingComma": "none",
+                "printWidth": 110
+            }
+        ],
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off",
+        "react-native/no-unused-styles": 2,
+        "react/jsx-uses-react": "off",
+        "react/require-default-props": "off",
+        "react/react-in-jsx-scope": "off",
+        "react-hooks/exhaustive-deps": "off",
+        "react/prop-types": "off",
+        "react/jsx-props-no-spreading": "off",
+        "react/no-multi-comp": [
+            "error",
+            {
+                "ignoreStateless": true
+            }
+        ],
+        "react/function-component-definition": [
+            "error",
+            {
+                "namedComponents": "arrow-function",
+                "unnamedComponents": "arrow-function"
+            }
+        ],
+        "camelcase": "off",
+        "func-names": [
+            "error",
+            "never"
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-console": "off",
+        "no-undef": "off",
+        "no-underscore-dangle": "off",
+        "object-property-newline": "error",
+        "prefer-destructuring": [
+            "error",
+            {
+                "object": true,
+                "array": false
+            }
+        ],
+        "react/jsx-filename-extension": [
+            1,
+            {
+                "extensions": [
+                    ".js",
+                    ".jsx",
+                    ".ts",
+                    ".tsx"
+                ]
+            }
+        ],
+        "import/no-commonjs": "error",
+        "import/extensions": "off",
+        "import/order": [
+            "error",
+            {
+                "groups": [
+                    [
+                        "external"
+                    ],
+                    [
+                        "internal"
+                    ],
+                    [
+                        "builtin"
+                    ],
+                    [
+                        "sibling"
+                    ],
+                    [
+                        "parent"
+                    ],
+                    [
+                        "index"
+                    ]
+                ],
+                "pathGroups": [
+                    {
+                        "pattern": "@Api",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "@Api/**",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "@Assets/Images/**",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "@Components/**",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "@Constants/**",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "@Callbacks",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "@Utils/**",
+                        "group": "internal",
+                        "position": "before"
+                    },
+                    {
+                        "pattern": "**",
+                        "group": "external",
+                        "position": "before"
+                    }
+                ],
+                "pathGroupsExcludedImportTypes": [
+                    "builtin"
+                ],
+                "newlines-between": "always",
+                "alphabetize": {
+                    "order": "asc",
+                    "caseInsensitive": true
+                }
+            }
+        ],
+        "padding-line-between-statements": [
+            "error",
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": "return"
+            },
+            {
+                "blankLine": "always",
+                "prev": [
+                    "const",
+                    "let",
+                    "var"
+                ],
+                "next": "*"
+            },
+            {
+                "blankLine": "never",
+                "prev": "singleline-const",
+                "next": "singleline-const"
+            },
+            {
+                "blankLine": "never",
+                "prev": "singleline-let",
+                "next": "singleline-let"
+            },
+            {
+                "blankLine": "never",
+                "prev": "singleline-var",
+                "next": "singleline-var"
+            },
+            {
+                "blankLine": "always",
+                "prev": [
+                    "case",
+                    "default"
+                ],
+                "next": "*"
+            },
+            {
+                "blankLine": "always",
+                "prev": "block-like",
+                "next": "*"
+            },
+            {
+                "blankLine": "always",
+                "prev": "*",
+                "next": "block-like"
+            }
+        ],
+        "arrow-parens": [
+            "error",
+            "always"
+        ],
+        "no-use-before-define": "off",
+        "global-require": "off"
+    }
+}
