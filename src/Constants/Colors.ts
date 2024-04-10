@@ -1,3 +1,5 @@
 export const enum Color {
-  White = "#fff"
+  White = "#fff",
+  Grey = "#54575C",
+  Night = "#312F3D"
 }
