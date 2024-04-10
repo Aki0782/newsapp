@@ -1,7 +1,12 @@
 {
   "extends": "@react-native/typescript-config/tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "./",
+    "target": "ESNext",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "isolatedModules": false,
+    "baseUrl": ".",
     "paths": {
       "@Api": [
         "src/Api"
