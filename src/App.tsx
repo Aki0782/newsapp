@@ -1,13 +1,15 @@
 import { useAppState } from "@react-native-community/hooks";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
-import { QueryClient, focusManager } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, focusManager } from "@tanstack/react-query";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { Logger, Toast } from "@Utils";
 import { AxiosError } from "axios";
 import React, { useEffect } from "react";
-import { SafeAreaView, ScrollView, StatusBar, useColorScheme } from "react-native";
+import { Platform, SafeAreaView, StatusBar, useColorScheme } from "react-native";
 import { MMKV } from "react-native-mmkv";
-import { Colors, Header } from "react-native/Libraries/NewAppScreen";
+import SplashScreen from "react-native-splash-screen";
+
+import Home from "./Pages/Home/Home";
 
 interface AsyncStorage {
   getItem: (key: string) => Promise<string | null>;
@@ -26,8 +28,8 @@ const storage: AsyncStorage = {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 60 * 24 * 2,
-      cacheTime: 1000 * 60 * 60 * 24 * 7,
+      staleTime: 1000 * 60 * 60 * 30,
+      cacheTime: 1000 * 60 * 60 * 4,
       retry: 0,
       refetchOnWindowFocus: true, // Focus Manager must be set to true manually using app state.
       onError: (error) => {
@@ -55,7 +57,7 @@ const App: React.FC = () => {
   const isDarkMode = useColorScheme() === "dark";
 
   const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter
+    flex: 1
   };
 
   useEffect(() => {
@@ -68,16 +70,19 @@ const App: React.FC = () => {
     }
   }, [appState]);
 
+  useEffect(() => {
+    if (Platform.OS === "android") SplashScreen.hide();
+  }, []);
+
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? "light-content" : "dark-content"}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView contentInsetAdjustmentBehavior="automatic" style={backgroundStyle}>
-        <Header />
-      </ScrollView>
-    </SafeAreaView>
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaView style={backgroundStyle}>
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        {/* <ScrollView contentInsetAdjustmentBehavior="automatic" style={backgroundStyle}> */}
+        <Home />
+        {/* </ScrollView> */}
+      </SafeAreaView>
+    </QueryClientProvider>
   );
 };
 
