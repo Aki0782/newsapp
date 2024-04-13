@@ -5,7 +5,7 @@ const newsApiUrl = `${Config.BASE_URL as string}/v2`;
 export default {
   getHeadlines(): performRequestTypes {
     return {
-      url: `${newsApiUrl}/top-headlines?language=en&pageSize=40`
+      url: `${newsApiUrl}/top-headlines?language=en&pageSize=100`
     };
   }
 };
