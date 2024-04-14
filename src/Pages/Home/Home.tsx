@@ -1,5 +1,5 @@
-import { Logger } from "@Utils";
-import React from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import React, { useEffect, useRef, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 
 import NewsHeadlines from "@Components/NewsHeadlines/NewsHeadlines";
@@ -11,9 +11,109 @@ import { useGetHeadlines } from "../../CallBacks/GetHeadlines/GetHeadlines";
 const ItemSeparator = (): React.ReactElement => <View style={styles.separator} />;
 
 const Home: React.FC = () => {
-  const { data } = useGetHeadlines();
+  const queryClient = useQueryClient();
+  const { data, refetch: refetchHeadlines } = useGetHeadlines();
+  const [headlines, setHeadlines] = useState<Article[]>([]);
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [titles, setTitles] = useState<string[]>([]);
+  const intervalRef = useRef<null | NodeJS.Timeout>(null);
 
-  Logger(data?.articles.length);
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffledArray = [...array]; // Create a copy of the original array
+
+    for (let i = shuffledArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1)); // Generate a random index
+
+      // Swap elements at index i and j
+      [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    }
+
+    return shuffledArray;
+  };
+
+  const pullToRefresh = (): void => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    if (articles.length > 0) {
+      const slicedTitles = titles.slice(0, 5);
+      const remainingTitles = titles.slice(5);
+
+      setTitles([]);
+      const artToPush = articles.filter((art) => slicedTitles.includes(art.title));
+
+      setArticles((prevArticles) => prevArticles.filter((art) => !slicedTitles.includes(art.title)));
+      setTitles(remainingTitles);
+      setHeadlines((prevHeadlines) => [...artToPush, ...prevHeadlines]);
+    }
+
+    startInterval();
+  };
+
+  const startInterval = (): void => {
+    intervalRef.current = setInterval(() => {
+      setTitles((prevTitles) => {
+        const slicedTitles = prevTitles.slice(0, 5);
+        const remainingTitles = prevTitles.slice(5);
+        const artToPush = articles.filter((art) => slicedTitles.includes(art.title));
+
+        setArticles((prevArticles) => prevArticles.filter((art) => !slicedTitles.includes(art.title)));
+        setTitles(remainingTitles);
+        setHeadlines((prevHeadlines) => [...artToPush, ...prevHeadlines]);
+
+        return remainingTitles;
+      });
+    }, 10000);
+  };
+
+  useEffect(() => {
+    if (data) {
+      const articlesResponse = [...data.articles.filter((art) => art.title !== "[Removed]")];
+      const splicedArticles = articlesResponse.splice(1, headlines.length === 0 ? 10 : 5);
+
+      setHeadlines((prev) => [...splicedArticles, ...prev]);
+      setArticles(articlesResponse);
+      const originalArray = articlesResponse.map((news) => news.title);
+
+      setTitles(shuffleArray(originalArray));
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (intervalRef.current === null && articles.length > 0) {
+      startInterval();
+    }
+  }, [articles]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (articles.length === 0 && data) {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      const refetch = async (): Promise<void> => {
+        queryClient.setQueryData(["getHeadlines"], () => undefined); // refetch query)
+
+        await refetchHeadlines();
+      };
+
+      refetch().catch((err) => {
+        console.error(err);
+      });
+    }
+  }, [articles]);
 
   const renderer = ({ item }: { item: Article }): React.ReactElement => {
     return (
@@ -32,7 +132,15 @@ const Home: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {data && <FlatList ItemSeparatorComponent={ItemSeparator} data={data.articles} renderItem={renderer} />}
+      {headlines.length > 0 && (
+        <FlatList
+          refreshing={false}
+          onRefresh={pullToRefresh}
+          ItemSeparatorComponent={ItemSeparator}
+          data={headlines}
+          renderItem={renderer}
+        />
+      )}
     </View>
   );
 };
