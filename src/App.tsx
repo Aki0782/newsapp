@@ -9,6 +9,10 @@ import { Platform, SafeAreaView, StatusBar, useColorScheme } from "react-native"
 import { MMKV } from "react-native-mmkv";
 import SplashScreen from "react-native-splash-screen";
 
+import Header from "@Components/Header/Header";
+
+import { Color } from "@Constants/Colors";
+
 import Home from "./Pages/Home/Home";
 
 interface AsyncStorage {
@@ -77,8 +81,8 @@ const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaView style={backgroundStyle}>
-        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
-        {/* <ScrollView contentInsetAdjustmentBehavior="automatic" style={backgroundStyle}> */}
+        <StatusBar backgroundColor={Color.White} barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <Header />
         <Home />
         {/* </ScrollView> */}
       </SafeAreaView>
