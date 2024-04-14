@@ -12,7 +12,7 @@ const ItemSeparator = (): React.ReactElement => <View style={styles.separator} /
 
 const Home: React.FC = () => {
   const queryClient = useQueryClient();
-  const { data, refetch: refetchHeadlines } = useGetHeadlines();
+  const { data, refetch: refetchHeadlines, isFetching } = useGetHeadlines();
   const [headlines, setHeadlines] = useState<Article[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [titles, setTitles] = useState<string[]>([]);
@@ -85,18 +85,7 @@ const Home: React.FC = () => {
     if (intervalRef.current === null && articles.length > 0) {
       startInterval();
     }
-  }, [articles]);
 
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     if (articles.length === 0 && data) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -114,6 +103,15 @@ const Home: React.FC = () => {
       });
     }
   }, [articles]);
+
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, []);
 
   const renderer = ({ item }: { item: Article }): React.ReactElement => {
     return (
@@ -134,7 +132,7 @@ const Home: React.FC = () => {
     <View style={styles.container}>
       {headlines.length > 0 && (
         <FlatList
-          refreshing={false}
+          refreshing={isFetching}
           onRefresh={pullToRefresh}
           ItemSeparatorComponent={ItemSeparator}
           data={headlines}
