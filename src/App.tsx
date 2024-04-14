@@ -28,8 +28,8 @@ const storage: AsyncStorage = {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 60 * 30,
-      cacheTime: 1000 * 60 * 60 * 4,
+      staleTime: 1000 * 60 * 10,
+      cacheTime: 1000 * 60 * 60,
       retry: 0,
       refetchOnWindowFocus: true, // Focus Manager must be set to true manually using app state.
       onError: (error) => {
