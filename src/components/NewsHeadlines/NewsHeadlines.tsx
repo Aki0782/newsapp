@@ -1,6 +1,9 @@
+import { Vibrate } from "@Utils";
 import React from "react";
-import { Linking, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Linking, StyleSheet, View } from "react-native";
 import FastImage from "react-native-fast-image";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import MaterialIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 import Label from "@Components/Label";
 
@@ -10,15 +13,24 @@ type NewsHeadlinesProps = {
   uri: string;
   title: string;
   url: string;
+  source: string;
+  isPinned: boolean;
 };
 
-const NewsHeadlines: React.FC<NewsHeadlinesProps> = ({ uri, title, url }) => {
+const NewsHeadlines: React.FC<NewsHeadlinesProps> = ({ uri, title, url, isPinned = false, source }) => {
   return (
-    <TouchableOpacity
+    <TouchableWithoutFeedback
       onPress={(): void => {
         void Linking.openURL(url);
+        Vibrate();
       }}
       style={styles.container}>
+      {isPinned && (
+        <View style={styles.pinnedIcon}>
+          <MaterialIcons name="pin-off" size={10} color={Color.White} />
+        </View>
+      )}
+
       <View style={styles.imageContainer}>
         <FastImage
           style={styles.image}
@@ -29,11 +41,16 @@ const NewsHeadlines: React.FC<NewsHeadlinesProps> = ({ uri, title, url }) => {
         />
       </View>
       <View style={styles.contentContainer}>
-        <Label style={styles.contentText} numberOfLines={3}>
-          {title}
-        </Label>
+        <View style={styles.headlineContainer}>
+          <Label style={styles.contentText} numberOfLines={3}>
+            {title}
+          </Label>
+        </View>
+        <View style={styles.authorContainer}>
+          <Label style={styles.author}>- {source}</Label>
+        </View>
       </View>
-    </TouchableOpacity>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -41,19 +58,20 @@ export default NewsHeadlines;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Color.Grey,
+    height: 80,
+    backgroundColor: Color.White,
     borderRadius: 5,
     padding: 6,
-    display: "flex",
     flexDirection: "row",
-    gap: 10
+    alignItems: "center",
+    justifyContent: "space-between" // Center content vertically
   },
   imageContainer: {
-    width: 100,
+    flexBasis: 100,
     height: 60,
     borderRadius: 4,
     overflow: "hidden",
-    backgroundColor: "lime"
+    marginRight: 10
   },
   image: {
     width: "100%",
@@ -63,6 +81,23 @@ const styles = StyleSheet.create({
     flex: 1
   },
   contentText: {
-    fontWeight: "600"
+    fontWeight: "600",
+    color: Color.Night
+  },
+  pinnedIcon: {
+    position: "absolute",
+    top: 4,
+    right: 4
+  },
+  author: {
+    fontSize: 12,
+    color: Color.Night
+  },
+  authorContainer: {
+    alignItems: "flex-end",
+    flexBasis: 14
+  },
+  headlineContainer: {
+    flex: 1
   }
 });
