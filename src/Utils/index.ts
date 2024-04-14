@@ -1,3 +1,4 @@
 import { Logger } from "./Logger";
 import { Toast } from "./Toast";
-export { Logger, Toast };
+import { Vibrate } from "./Vibrate";
+export { Logger, Toast, Vibrate };
