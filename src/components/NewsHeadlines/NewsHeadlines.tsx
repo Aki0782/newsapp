@@ -27,7 +27,7 @@ const NewsHeadlines: React.FC<NewsHeadlinesProps> = ({ uri, title, url, isPinned
       style={styles.container}>
       {isPinned && (
         <View style={styles.pinnedIcon}>
-          <MaterialIcons name="pin-off" size={10} color={Color.White} />
+          <MaterialIcons name="pin" size={12} color={Color.Night} />
         </View>
       )}
 
