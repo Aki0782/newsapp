@@ -11,8 +11,6 @@ import SplashScreen from "react-native-splash-screen";
 
 import Header from "@Components/Header/Header";
 
-import { Color } from "@Constants/Colors";
-
 import Home from "./Pages/Home/Home";
 
 interface AsyncStorage {
@@ -75,13 +73,13 @@ const App: React.FC = () => {
   }, [appState]);
 
   useEffect(() => {
-    if (Platform.OS === "android") SplashScreen.hide();
+    if (Platform.OS === "android") setTimeout(() => SplashScreen.hide(), 1000);
   }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaView style={backgroundStyle}>
-        <StatusBar backgroundColor={Color.White} barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <StatusBar backgroundColor="transparent" barStyle={!isDarkMode ? "light-content" : "dark-content"} />
         <Header />
         <Home />
         {/* </ScrollView> */}
