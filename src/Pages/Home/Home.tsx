@@ -11,15 +11,23 @@ import NewsHeadlines from "@Components/NewsHeadlines/NewsHeadlines";
 
 import { Color } from "@Constants/Colors";
 
+import { mmkv } from "../../App";
 import { useGetHeadlines } from "../../CallBacks/GetHeadlines/GetHeadlines";
 
 const ItemSeparator = (): React.ReactElement => <View style={styles.separator} />;
+
+type StateProps = {
+  articles: Article[];
+  titles: string[];
+  headlines: Article[];
+  pinnedHeadlines: Article | object;
+};
 
 const Home: React.FC = () => {
   const queryClient = useQueryClient();
   const { data, refetch: refetchHeadlines, isFetching } = useGetHeadlines();
   const [headlines, setHeadlines] = useState<Article[]>([]);
-  const [pinnedHeadlines, setPinnedHeadlines] = useState<Article>();
+  const [pinnedHeadlines, setPinnedHeadlines] = useState<Article | object>({});
   const [articles, setArticles] = useState<Article[]>([]);
   const [titles, setTitles] = useState<string[]>([]);
   const intervalRef = useRef<null | NodeJS.Timeout>(null);
@@ -66,9 +74,12 @@ const Home: React.FC = () => {
         const remainingTitles = prevTitles.slice(5);
         const artToPush = articles.filter((art) => slicedTitles.includes(art.title));
 
-        setArticles((prevArticles) => prevArticles.filter((art) => !slicedTitles.includes(art.title)));
-        setTitles(remainingTitles);
-        setHeadlines((prevHeadlines) => [...artToPush, ...prevHeadlines]);
+        setArticles((prevArticles) => {
+          return prevArticles.filter((art) => !slicedTitles.includes(art.title));
+        });
+        setHeadlines((prevHeadlines) => {
+          return [...artToPush, ...prevHeadlines];
+        });
 
         return remainingTitles;
       });
@@ -95,22 +106,31 @@ const Home: React.FC = () => {
     const selectedHeadlines = headlines.filter((art) => art.title === title);
 
     if (isPinned && pinnedHeadlines) {
-      setHeadlines((prev) => [...prev, pinnedHeadlines]);
-      setPinnedHeadlines(undefined);
+      setHeadlines((prev) => {
+        return [...prev, pinnedHeadlines] as Article[];
+      });
+      setPinnedHeadlines({});
+      mmkv.set("pinnedItem", JSON.stringify(""));
 
       return;
     }
 
     if (!isPinned && pinnedHeadlines) {
-      setHeadlines((prev) => [...prev.filter((art) => art.title !== title), pinnedHeadlines]);
+      setHeadlines((prev) => {
+        return [...prev.filter((art) => art.title !== title), pinnedHeadlines] as Article[];
+      });
       setPinnedHeadlines(selectedHeadlines[0]);
+      mmkv.set("pinnedItem", JSON.stringify(selectedHeadlines[0]));
 
       return;
     }
 
     if (!isPinned) {
       setPinnedHeadlines(selectedHeadlines[0]);
-      setHeadlines((prev) => prev.filter((art) => art.title !== title));
+      mmkv.set("pinnedItem", JSON.stringify(selectedHeadlines[0]));
+      setHeadlines((prev) => {
+        return prev.filter((art) => art.title !== title);
+      });
     }
 
     Vibrate();
@@ -128,6 +148,29 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
+    const state = mmkv.getString("state");
+    const parsedState: StateProps = state && JSON.parse(state);
+
+    if (parsedState?.pinnedHeadlines) {
+      setPinnedHeadlines(parsedState.pinnedHeadlines);
+    }
+
+    if (parsedState?.headlines.length > 0) {
+      setHeadlines(parsedState.headlines);
+    }
+
+    if (parsedState?.titles.length > 0) {
+      setTitles(parsedState.titles);
+    }
+
+    if (parsedState?.articles.length > 0) {
+      console.log("triggered");
+      setArticles(parsedState.articles);
+      startInterval();
+
+      return;
+    }
+
     if (data) {
       const articlesResponse = [...data.articles.filter((art) => art.title !== "[Removed]")];
       const splicedArticles = articlesResponse.splice(1, headlines.length === 0 ? 10 : 5);
@@ -141,11 +184,22 @@ const Home: React.FC = () => {
   }, [data]);
 
   useEffect(() => {
+    const state = {
+      articles,
+      titles,
+      headlines,
+      pinnedHeadlines
+    };
+
+    mmkv.set("state", JSON.stringify(state));
+  }, [articles, titles, headlines, pinnedHeadlines]);
+
+  useEffect(() => {
     if (intervalRef.current === null && articles.length > 0) {
       startInterval();
     }
 
-    if (articles.length === 0 && data) {
+    if (articles.length === 0) {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -183,7 +237,7 @@ const Home: React.FC = () => {
         renderLeftActions={() => leftView(item.title)}
         renderRightActions={() => rightView(item.title)}>
         <NewsHeadlines
-          source={item.source.name}
+          source={item.source?.name}
           isPinned={false}
           uri={
             item.urlToImage ||
@@ -199,18 +253,18 @@ const Home: React.FC = () => {
   return (
     <GestureHandlerRootView>
       <View style={styles.container}>
-        {pinnedHeadlines && (
+        {Object.keys(pinnedHeadlines).length > 0 && (
           <View style={styles.pinnedContainer}>
-            <Swipeable renderRightActions={() => rightView(pinnedHeadlines.title, true)}>
+            <Swipeable renderRightActions={() => rightView((pinnedHeadlines as Article)?.title, true)}>
               <NewsHeadlines
-                source={pinnedHeadlines.source.name}
+                source={(pinnedHeadlines as Article).source.name}
                 isPinned={Boolean(pinnedHeadlines)}
                 uri={
-                  pinnedHeadlines.urlToImage ||
+                  (pinnedHeadlines as Article).urlToImage ||
                   "https://plus.unsplash.com/premium_photo-1691223714882-57a432c4edaf?q=80&w=3281&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 }
-                title={pinnedHeadlines.title}
-                url={pinnedHeadlines.url}
+                title={(pinnedHeadlines as Article).title}
+                url={(pinnedHeadlines as Article).url}
               />
             </Swipeable>
           </View>
